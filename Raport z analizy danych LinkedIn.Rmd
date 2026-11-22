@@ -1,0 +1,26 @@
+---
+title: "Raport z analizy danych LinkedIn"
+date: "`r Sys.Date()`"
+author: Alicja Kuklińska, Julia Miernik, Stanisław Bogusz
+output:
+  rmdformats::html_clean:
+    highlight: kate
+---
+
+```{r setup, include=FALSE}
+## Global options
+knitr::opts_chunk$set(cache = TRUE)
+
+publikacje <- read.csv("postings.csv")
+library(tidyverse)
+library(naniar)
+```
+
+# 1. Wprowadzenie
+
+# 2. Porządkowanie i czyszczenie danych
+
+Liczba braków danych to: `r n_miss(publikacje)`,
+co stanowi `r pct_miss(publikacje)` % wszystkich danych
+
+
