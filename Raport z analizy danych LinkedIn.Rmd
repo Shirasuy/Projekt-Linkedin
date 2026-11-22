@@ -14,13 +14,38 @@ knitr::opts_chunk$set(cache = TRUE)
 publikacje <- read.csv("postings.csv")
 library(tidyverse)
 library(naniar)
+library(psych)
 ```
 
 # 1. Wprowadzenie
 
-# 2. Porządkowanie i czyszczenie danych
+# 2. Łączenie danych
+
+# 3. Porządkowanie i czyszczenie danych
 
 Liczba braków danych to: `r n_miss(publikacje)`,
-co stanowi `r pct_miss(publikacje)` % wszystkich danych
+co stanowi `r round(pct_miss(publikacje), 2)` % wszystkich danych
+
+```{r}
+gg_miss_var(publikacje)
+gg_miss_upset(publikacje)
+
+# shadow-mapa NA
+vis_miss(publikacje, warn_large_data = FALSE)
+gg_miss_fct(publikacje, fct = work_type)
+
+publikacje %>%
+  group_by(work_type) %>%
+  miss_var_summary()
 
 
+```
+
+## 3.1 Spójność danych
+
+
+## 3.2 Imputacja braków danych
+
+
+```{r}
+library(VIM)
