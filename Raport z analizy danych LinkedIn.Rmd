@@ -7,45 +7,36 @@ output:
     highlight: kate
 ---
 
-```{r setup, include=FALSE}
-## Global options
+```{r biblioteki, include=FALSE}
 knitr::opts_chunk$set(cache = TRUE)
 
-publikacje <- read.csv("postings.csv")
 library(tidyverse)
-library(naniar)
-library(psych)
+library(dplyr)
+library(VIM)
+```
+
+```{r wczytywanie i łączenie danych, include=FALSE, warning=FALSE}
+postings <- read.csv("postings.csv")
+benefits <- read.csv("benefits.csv")
+employee_counts <- read.csv("employee_counts.csv")
+industries <- read.csv("industries.csv")
+job_industries <- read.csv("job_industries.csv")
+job_skills <- read.csv("job_skills.csv")
+skills <- read.csv("skills.csv")
+
+dane <- postings %>%
+  left_join(benefits, by = "job_id") %>%
+  left_join(employee_counts, by = "company_id") %>%
+  left_join(job_industries, by = "job_id") %>%
+  left_join(industries, by = "industry_id") %>%
+  left_join(job_skills, by = "job_id") %>%
+  inner_join(skills, by = "skill_abr") %>%
+  select(-c(original_listed_time, job_posting_url, application_url, application_type, expiry, closed_time, listed_time, posting_domain, zip_code, fips, inferred ))
+```
+
+``` {r czyszczenie danych, include=FALSE}
+
 ```
 
 # 1. Wprowadzenie
 
-# 2. Łączenie danych
-
-# 3. Porządkowanie i czyszczenie danych
-
-Liczba braków danych to: `r n_miss(publikacje)`,
-co stanowi `r round(pct_miss(publikacje), 2)` % wszystkich danych
-
-```{r}
-gg_miss_var(publikacje)
-gg_miss_upset(publikacje)
-
-# shadow-mapa NA
-vis_miss(publikacje, warn_large_data = FALSE)
-gg_miss_fct(publikacje, fct = work_type)
-
-publikacje %>%
-  group_by(work_type) %>%
-  miss_var_summary()
-
-
-```
-
-## 3.1 Spójność danych
-
-
-## 3.2 Imputacja braków danych
-
-
-```{r}
-library(VIM)
