@@ -12,7 +12,8 @@ knitr::opts_chunk$set(cache = TRUE)
 
 library(tidyverse)
 library(dplyr)
-library(VIM)
+library(validate)
+library(naniar)
 ```
 
 ```{r wczytywanie i łączenie danych, include=FALSE, warning=FALSE}
@@ -31,11 +32,39 @@ dane <- postings %>%
   left_join(industries, by = "industry_id") %>%
   left_join(job_skills, by = "job_id") %>%
   inner_join(skills, by = "skill_abr") %>%
-  select(-c(original_listed_time, job_posting_url, application_url, application_type, expiry, closed_time, listed_time, posting_domain, zip_code, fips, inferred ))
+  select(-c(original_listed_time, job_posting_url, application_url, application_type, expiry, closed_time, listed_time, posting_domain, zip_code, fips, inferred, currency, work_type, compensation_type, time_recorded, med_salary))
 ```
 
-``` {r czyszczenie danych, include=FALSE}
+``` {r czyszczenie danych}
+warunki <- validator(
+  max_min_wypłaty =
+    max_salary >= min_salary & min_salary >= 0,
 
+  standaryzacja_wypłaty =
+    (pay_period == "HOURLY" &
+       abs(normalized_salary - ((max_salary + min_salary) / 2 * 2080)) < 0.01) |
+    (pay_period == "BIWEEKLY" &
+       abs(normalized_salary - ((max_salary + min_salary) / 2 * 26)) < 0.01) |
+    (pay_period == "WEEKLY" &
+       abs(normalized_salary - ((max_salary + min_salary) / 2 * 52)) < 0.01) |
+    (pay_period == "MONTHLY" &
+       abs(normalized_salary - ((max_salary + min_salary) / 2 * 12)) < 0.01) |
+    (pay_period == "YEARLY" &
+       abs(normalized_salary - ((max_salary + min_salary) / 2)) < 0.01) |
+    max_salary == 0 | min_salary == 0 | normalized_salary == 0,
+  wyświetlenia = views >= 0,
+  zgłoszenia = applies >= 0,
+  pracownicy = employee_count >= 0,
+  obserwatorzy = follower_count >= 0
+)
+
+cf <- confront(dane, warunki)
+summary(cf)
+miss_var_summary(dane)
+
+
+dane <- dane %>%
+  replace_na(list(remote_allowed = 0))
 ```
 
 # 1. Wprowadzenie
