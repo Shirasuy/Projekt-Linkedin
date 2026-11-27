@@ -65,6 +65,8 @@ miss_var_summary(dane)
 
 dane <- dane %>%
   replace_na(list(remote_allowed = 0))
+# zakładamy że brak informacji o tym, czy praca jest zdalna oznacza, że nie jest zdalna
+# rozpisz, że to jest raczej benefit i jak jakaś firma oferuje taką możliwość to raczej się tym chwali czy coś
 ```
 
 # 1. Wprowadzenie
